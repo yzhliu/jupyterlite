@@ -887,17 +887,15 @@ class C:
     PYPI_API = f"{PYPI}/pypi"
     PYPI_SRC = f"{PYPI}/packages/source"
     PYODIDE_GH = f"{GH}/pyodide/pyodide"
-    PYODIDE_DOWNLOAD = f"{PYODIDE_GH}/releases/download"
-    PYODIDE_VERSION = "0.21.3"
+    PYODIDE_DOWNLOAD = "http://localhost:8111/releases/download"
+    PYODIDE_VERSION = "0.21.4"
     PYODIDE_JS = "pyodide.js"
     PYODIDE_ARCHIVE = f"pyodide-build-{PYODIDE_VERSION}.tar.bz2"
     PYODIDE_URL = os.environ.get(
         "JUPYTERLITE_PYODIDE_URL",
         f"{PYODIDE_DOWNLOAD}/{PYODIDE_VERSION}/{PYODIDE_ARCHIVE}",
     )
-    PYODIDE_CDN_URL = (
-        f"https://cdn.jsdelivr.net/pyodide/v{PYODIDE_VERSION}/full/{PYODIDE_JS}"
-    )
+    PYODIDE_CDN_URL = "http://localhost:8111/pyodide/pyodide.js"
 
     JUPYTERLITE_JSON = "jupyter-lite.json"
     JUPYTERLITE_IPYNB = "jupyter-lite.ipynb"
