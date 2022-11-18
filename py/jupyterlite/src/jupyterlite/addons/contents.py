@@ -16,7 +16,7 @@ class ContentsAddon(BaseAddon):
 
     def status(self, manager):
         """yield some status information about the state of contents"""
-        yield dict(
+        yield self.task(
             name="contents",
             actions=[
                 lambda: self.log.debug(
@@ -38,7 +38,7 @@ class ContentsAddon(BaseAddon):
         for src_file, dest_file in contents:
             all_dest_files += [dest_file]
             rel = dest_file.relative_to(output_files_dir)
-            yield dict(
+            yield self.task(
                 name=f"copy:{rel}",
                 doc=f"copy {src_file} to {rel}",
                 file_dep=[src_file],
@@ -49,7 +49,7 @@ class ContentsAddon(BaseAddon):
             )
 
         if manager.source_date_epoch is not None:
-            yield dict(
+            yield self.task(
                 name="timestamp",
                 file_dep=all_dest_files,
                 actions=[
@@ -69,7 +69,7 @@ class ContentsAddon(BaseAddon):
             stem = output_file_dir.relative_to(self.output_files_dir)
             api_path = self.api_dir / stem / ALL_JSON
 
-            yield dict(
+            yield self.task(
                 name=f"contents:{stem}",
                 doc=f"create a Jupyter Contents API response for {stem}",
                 actions=[
@@ -84,7 +84,7 @@ class ContentsAddon(BaseAddon):
         """verify that all Contents API is valid (sorta)"""
         for all_json in self.api_dir.rglob(ALL_JSON):
             stem = all_json.relative_to(self.api_dir)
-            yield dict(
+            yield self.task(
                 name=f"validate:{stem}",
                 doc=f"(eventually) validate {stem} with the Jupyter Contents API",
                 file_dep=[all_json],
@@ -125,7 +125,10 @@ class ContentsAddon(BaseAddon):
         if root is not None:
             rel_posix_path = f"/{path.relative_to(root).as_posix()}"
 
-            for ignore in self.manager.ignore_contents:
+            for ignore in [
+                *self.manager.ignore_contents,
+                *self.manager.extra_ignore_contents,
+            ]:
                 if re.findall(ignore, rel_posix_path):
                     return
 
@@ -160,14 +163,32 @@ class ContentsAddon(BaseAddon):
 
         fm = FileContentsManager(root_dir=str(self.output_files_dir), parent=self)
 
-        listing_path = str(
-            output_file_dir.relative_to(self.output_files_dir).as_posix()
+        listing_path = output_file_dir.as_uri().replace(
+            self.output_files_dir.as_uri(), "/"
         )
 
-        if listing_path.startswith("."):
-            listing_path = listing_path[1:]
+        try:
+            listing = fm.get(listing_path)
+        except Exception as error:
+            print(
+                f"""Couldn't fetch {listing_path} as Jupyter contents.  {error}
+                If this folder, or one of its parents, starts with a `.`, you can
+                enable indexing hidden files with a `jupyter_lite_config.json` such as:
 
-        listing = fm.get(listing_path)
+                    "ContentsManager": {{
+                        "allow_hidden": true
+                    }}
+
+                Alternately, to skip it:
+
+                    "LiteBuildConfig": {{
+                        "extra_ignore_contents": [
+                            "/\\.<the offendings path name>"
+                        ]
+                    }}
+                """
+            )
+            return False
 
         if self.manager.source_date_epoch is not None:
             listing = self.patch_listing_timestamps(listing)

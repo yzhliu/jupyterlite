@@ -2,7 +2,8 @@
 from pathlib import Path
 
 from jupyter_core.application import JupyterApp, base_aliases, base_flags
-from traitlets import Bool, Instance, Unicode, default
+from jupyter_core.paths import jupyter_config_path
+from traitlets import Bool, Instance, List, Unicode, default
 
 from . import __version__
 from .addons.piplite import list_wheels
@@ -48,6 +49,10 @@ class BaseLiteApp(JupyterApp, LiteBuildConfig, DescribedMixin):
 
     config_file_name = Unicode("jupyter_lite_config").tag(config=True)
 
+    config_file_paths = List(
+        Unicode(help="Paths to search for jupyter_lite.(py|json)")
+    ).tag(config=True)
+
     # traitlets app stuff
     aliases = dict(
         **base_aliases,
@@ -62,6 +67,7 @@ class BaseLiteApp(JupyterApp, LiteBuildConfig, DescribedMixin):
             # contents
             "contents": "LiteBuildConfig.contents",
             "ignore-contents": "LiteBuildConfig.ignore_contents",
+            "extra-ignore-contents": "LiteBuildConfig.extra_ignore_contents",
             # settings
             "settings-overrides": "LiteBuildConfig.settings_overrides",
             "mathjax-dir": "LiteBuildConfig.mathjax_dir",
@@ -79,6 +85,10 @@ class BaseLiteApp(JupyterApp, LiteBuildConfig, DescribedMixin):
     )
 
     flags = lite_flags
+
+    @default("config_file_paths")
+    def _config_file_paths_default(self):
+        return [str(Path.cwd())] + jupyter_config_path()
 
 
 class ManagedApp(BaseLiteApp):
@@ -107,6 +117,8 @@ class ManagedApp(BaseLiteApp):
             kwargs["contents"] = [Path(p) for p in self.contents]
         if self.ignore_contents:
             kwargs["ignore_contents"] = self.ignore_contents
+        if self.extra_ignore_contents:
+            kwargs["extra_ignore_contents"] = self.extra_ignore_contents
         if self.settings_overrides:
             kwargs["settings_overrides"] = [Path(p) for p in self.settings_overrides]
         if self.apps:
