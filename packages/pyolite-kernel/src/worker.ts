@@ -201,6 +201,8 @@ export class PyoliteRemoteKernel {
       await piplite.install(['matplotlib', 'ipykernel'], keep_going=True);
       await piplite.install(['pyolite'], keep_going=True);
       await piplite.install(['ipython'], keep_going=True);
+      await piplite.install(['lightgbm'], keep_going=True);
+      await piplite.install(['aglite-test'], keep_going=True);
       import pyolite
     `);
     // cd to the kernel location

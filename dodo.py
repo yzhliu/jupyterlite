@@ -909,7 +909,7 @@ class C:
     PYPI_API = f"{PYPI}/pypi"
     PYPI_SRC = f"{PYPI}/packages/source"
     PYODIDE_GH = f"{GH}/pyodide/pyodide"
-    PYODIDE_DOWNLOAD = "http://localhost:8111/releases/download"
+    PYODIDE_DOWNLOAD = "https://autogluon.s3.us-west-2.amazonaws.com/pyodide_dist/releases/download"
     PYODIDE_VERSION = "0.21.4"
     PYODIDE_JS = "pyodide.js"
     PYODIDE_ARCHIVE = f"pyodide-build-{PYODIDE_VERSION}.tar.bz2"
@@ -917,7 +917,7 @@ class C:
         "JUPYTERLITE_PYODIDE_URL",
         f"{PYODIDE_DOWNLOAD}/{PYODIDE_VERSION}/{PYODIDE_ARCHIVE}",
     )
-    PYODIDE_CDN_URL = "http://localhost:8111/pyodide/pyodide.js"
+    PYODIDE_CDN_URL = "https://autogluon.s3.us-west-2.amazonaws.com/pyodide_dist/pyodide/pyodide.js"
 
     JUPYTERLITE_JSON = "jupyter-lite.json"
     JUPYTERLITE_IPYNB = "jupyter-lite.ipynb"

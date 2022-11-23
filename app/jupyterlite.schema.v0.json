@@ -213,7 +213,7 @@
         "pyodideUrl": {
           "description": "The path to the main pyodide.js entry point",
           "type": "string",
-          "default": "http://localhost:8111/pyodide/pyodide.js",
+          "default": "https://autogluon.s3.us-west-2.amazonaws.com/pyodide_dist/pyodide/pyodide.js",
           "format": "uri"
         },
         "disablePyPIFallback": {
